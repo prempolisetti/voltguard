@@ -132,6 +132,7 @@ html,body { height:100%; overflow:hidden; font-family:-apple-system,'SF Pro Disp
         <div class="hero-hint" id="heroHint">All systems nominal</div>
       </div>
       <div class="q-stats">
+    
         <div class="q-stat"><div class="lbl">Failure Risk</div><div class="val" id="riskVal">--<span>%</span></div></div>
       </div>
       <div class="metrics-row">
@@ -328,7 +329,6 @@ function render(d) {
   const hints = { normal: "All systems nominal", warning: "Attention recommended", critical: "Immediate inspection required" };
   document.getElementById("heroHint").textContent = hints[s] || "Monitoring";
 
-  document.getElementById("rulVal").innerHTML = d.rul_days + "<span>days</span>";
   document.getElementById("riskVal").innerHTML = d.risk + "<span>%</span>";
   document.getElementById("vVal").textContent = d.voltage.toFixed(2) + "V";
   document.getElementById("cVal").textContent = d.current.toFixed(2) + "A";
