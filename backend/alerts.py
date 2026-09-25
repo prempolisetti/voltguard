@@ -12,9 +12,9 @@ from datetime import datetime
 # ==========================================
 # ⚠️ CONFIGURE THESE (setup steps కింద)
 # ==========================================
-GMAIL_USER = "your_email@gmail.com"       # మీ Gmail address
+GMAIL_USER = "prempolisetti4492@gmail.com"       # మీ Gmail address
 GMAIL_APP_PASSWORD = "xxxx xxxx xxxx xxxx"  # 16-character app password
-TO_EMAIL = "your_email@gmail.com"           # alerts ఎవరికి పంపాలి
+TO_EMAIL = "prempolisetti492@gmail.com"           # alerts ఎవరికి పంపాలి
 
 # ==========================================
 # Anti-spam tracker

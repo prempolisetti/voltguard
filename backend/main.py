@@ -17,9 +17,6 @@ app.add_middleware(
 
 init_db()
 
-# ==========================================
-# STATE
-# ==========================================
 battery = {
     "voltage": 12.6,
     "current": 2.0,
@@ -34,9 +31,6 @@ battery = {
     "timestamp": datetime.now().isoformat()
 }
 
-# ==========================================
-# AI AGENT REASONING
-# ==========================================
 def calculate_health(v, c, t):
     score = 100.0
     score -= abs(12.6 - v) * 20
@@ -102,9 +96,6 @@ def recommend_action(status, t, v, health):
         return "Schedule inspection within 48 hours. Reduce load if possible."
     return "No action needed. Battery is healthy. Continue normal operation."
 
-# ==========================================
-# UPDATE
-# ==========================================
 def update_battery(v, c, t, soc):
     v = round(v, 2)
     c = round(c, 2)
@@ -140,9 +131,6 @@ def update_battery(v, c, t, soc):
         except Exception as e:
             print(f"[ALERT ERROR] {e}")
 
-# ==========================================
-# ROUTES
-# ==========================================
 @app.get("/")
 def root():
     return {"app": "VoltGuard", "status": "running"}
