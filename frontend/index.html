@@ -132,7 +132,6 @@ html,body { height:100%; overflow:hidden; font-family:-apple-system,'SF Pro Disp
         <div class="hero-hint" id="heroHint">All systems nominal</div>
       </div>
       <div class="q-stats">
-    
         <div class="q-stat"><div class="lbl">Failure Risk</div><div class="val" id="riskVal">--<span>%</span></div></div>
       </div>
       <div class="metrics-row">
@@ -163,7 +162,7 @@ html,body { height:100%; overflow:hidden; font-family:-apple-system,'SF Pro Disp
     </div>
     <div class="tab-page" id="tab-alerts">
       <div class="section-h"><h2>Alert History</h2></div>
-      <div id="alertList"><div class="alert-item"><div class="time">No alerts yet</div><div class="status">System ready</div></div></div>
+      <div id="alertList"><div class="alert-item"><div class="time">Loading...</div><div class="status">Fetching alerts</div></div></div>
     </div>
     <div class="tab-page" id="tab-info">
       <div class="section-h"><h2>System Status</h2></div>
@@ -401,7 +400,7 @@ async function loadAlerts() {
     const r = await fetch(API + "/alerts");
     const d = await r.json();
     const list = document.getElementById("alertList");
-    if (!d.alerts.length) {
+    if (!d.alerts || !d.alerts.length) {
       list.innerHTML = '<div class="alert-item"><div class="time">No alerts yet</div><div class="status">System ready</div></div>';
       return;
     }
@@ -411,7 +410,9 @@ async function loadAlerts() {
       '<div class="status">' + a.status + ' — Risk ' + a.risk + '% | V:' + a.voltage + 'V T:' + a.temperature + '°C</div>' +
       '</div>'
     ).join("");
-  } catch(e){}
+  } catch(e){
+    console.error("loadAlerts error:", e);
+  }
 }
 
 function approveAction() {
@@ -428,6 +429,15 @@ function showToast(msg, type) {
 }
 
 setInterval(fetchData, 1500);
+
+// ⚠️ Auto-refresh alerts every 5 sec when Alerts tab is active
+setInterval(() => {
+  const alertsTab = document.getElementById("tab-alerts");
+  if (alertsTab && alertsTab.classList.contains("active")) {
+    loadAlerts();
+  }
+}, 5000);
+
 fetchData();
 </script>
 </body>

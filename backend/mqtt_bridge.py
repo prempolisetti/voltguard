@@ -38,4 +38,7 @@ def main():
     client.loop_forever()
 
 if __name__ == "__main__":
-    main()
+    main()    fetch("http://127.0.0.1:5000/data")
+      .then(r => r.json())
+      .then(d => console.log(d))
+      .catch(err => console.error(err))
