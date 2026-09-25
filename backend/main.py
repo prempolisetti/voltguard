@@ -37,20 +37,20 @@ battery = {
 
 
 # ==========================================
-# UPDATE BATTERY — uses agent + email alert
+# UPDATE BATTERY — uses agent.py, NO email here
 # ==========================================
 def update_battery(v, c, t, soc):
     v = round(v, 2)
     c = round(c, 2)
     t = round(t, 1)
 
-    # Get current history
+    # Get current history for trend analysis
     history = get_history(10)
 
     # Run AI Agent reasoning
     result = agent_reasoning(v, c, t, history)
 
-    # Update battery state
+    # Update global battery state
     battery.update({
         "voltage": v,
         "current": c,
@@ -68,17 +68,9 @@ def update_battery(v, c, t, soc):
     # Save to database
     insert_reading(v, c, t, result["status"], result["risk"], result["health"])
 
-    # ==========================================
-    # EMAIL ALERT — trigger on WARNING / CRITICAL
-    # ==========================================
+    # Log alert to database (but don't send email here)
     if result["status"] in ["WARNING", "CRITICAL"]:
         insert_alert(result["status"], result["risk"], v, t)
-        try:
-            print(f"[EMAIL] Sending {result['status']} alert...")
-            send_alert(battery)
-            print(f"[EMAIL] ✓ Alert sent for {result['status']}")
-        except Exception as e:
-            print(f"[EMAIL ERROR] {e}")
 
 
 # ==========================================
@@ -104,6 +96,9 @@ def alerts():
     return {"alerts": get_alerts(20)}
 
 
+# ==========================================
+# SIMULATE — EMAIL ALERT TRIGGER FOR WARNING + CRITICAL
+# ==========================================
 @app.post("/simulate/{phase}")
 def simulate(phase: str):
     if phase == "normal":
@@ -124,20 +119,33 @@ def simulate(phase: str):
     else:
         return {"error": "Invalid phase"}
 
+    # Update battery with new readings
     update_battery(v, c, t, soc)
-    
-    # DIRECT EMAIL TRIGGER - GUARANTEED
+
+    # ==========================================
+    # EMAIL ALERT — Sends for BOTH WARNING and CRITICAL
+    # ==========================================
     if battery["status"] in ["WARNING", "CRITICAL"]:
         try:
-            from alerts import send_alert
+            print(f"\n[EMAIL] Attempting {battery['status']} alert...")
+            print(f"        Voltage: {battery['voltage']}V")
+            print(f"        Temperature: {battery['temperature']}°C")
+            print(f"        Risk: {battery['risk']}%")
+            
             send_alert(battery)
+            
             print(f"[EMAIL] ✓ SENT — {battery['status']}")
         except Exception as e:
             print(f"[EMAIL ERROR] {e}")
-    
+    else:
+        print(f"[STATE] {battery['status']} — no email needed")
+
     return battery
 
 
+# ==========================================
+# RESET
+# ==========================================
 @app.post("/reset")
 def reset():
     clear_all()
@@ -151,12 +159,16 @@ def reset():
     return {"status": "reset"}
 
 
+# ==========================================
+# APPROVE
+# ==========================================
 @app.post("/agent/approve")
 def approve():
     ticket = "MT-" + str(random.randint(1000, 9999))
+    print(f"[AGENT] Human approved — Ticket {ticket}")
     return {"approved": True, "ticket": ticket}
 
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run(app, host="127.0.0.1", port=5000)

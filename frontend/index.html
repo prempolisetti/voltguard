@@ -1,15 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#05070d">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="VoltGuard">
 <title>VoltGuard</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 :root {
@@ -18,223 +13,146 @@
   --text:#f1f5f9; --dim:#94a3b8; --faint:#566274;
   --accent:#38bdf8; --success:#10b981; --warning:#f59e0b; --critical:#ef4444;
 }
-html,body { height:100%; overflow:hidden; font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Inter',sans-serif; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; }
+html,body { height:100%; overflow:hidden; font-family:-apple-system,'SF Pro Display','Inter',sans-serif; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; }
 .app { display:flex; flex-direction:column; height:100vh; max-width:430px; margin:0 auto; background:var(--bg); position:relative; overflow:hidden; }
-
-/* STATUS BAR */
-.status-bar { display:flex; justify-content:space-between; align-items:center; padding:12px 24px 4px; font-size:0.82em; font-weight:600; flex-shrink:0; }
+.status-bar { display:flex; justify-content:space-between; align-items:center; padding:12px 24px 4px; font-size:0.82em; font-weight:600; }
 .status-bar .time { font-variant-numeric:tabular-nums; }
-.status-bar .icons { display:flex; gap:5px; }
-
-/* TOP BAR */
-.top-bar { display:flex; align-items:center; justify-content:space-between; padding:8px 20px 18px; flex-shrink:0; }
+.top-bar { display:flex; align-items:center; justify-content:space-between; padding:8px 20px 18px; }
 .brand-row { display:flex; align-items:center; gap:11px; }
 .logo-mark { width:38px; height:38px; border-radius:11px; background:linear-gradient(145deg,#38bdf8,#0284c7); display:flex; align-items:center; justify-content:center; font-size:20px; box-shadow:0 4px 20px rgba(56,189,248,0.4); }
-.brand-row h1 { font-size:1.18em; font-weight:700; letter-spacing:-0.03em; }
+.brand-row h1 { font-size:1.18em; font-weight:700; }
 .brand-row .sub { font-size:0.68em; color:var(--faint); margin-top:1px; }
-.live-dot { display:flex; align-items:center; gap:6px; padding:6px 12px; background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.2); border-radius:20px; font-size:0.65em; font-weight:700; letter-spacing:0.08em; color:var(--success); text-transform:uppercase; }
+.live-dot { display:flex; align-items:center; gap:6px; padding:6px 12px; background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.2); border-radius:20px; font-size:0.65em; font-weight:700; color:var(--success); text-transform:uppercase; }
 .live-dot .dot { width:6px; height:6px; border-radius:50%; background:currentColor; box-shadow:0 0 8px currentColor; animation:blink 2s infinite; }
 .live-dot.off { color:var(--critical); background:rgba(239,68,68,0.08); border-color:rgba(239,68,68,0.2); }
 @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
-
-/* SCREEN */
-.screen { flex:1; overflow-y:auto; padding:0 18px 110px; scrollbar-width:none; }
-.screen::-webkit-scrollbar { display:none; }
+.screen { flex:1; overflow-y:auto; padding:0 18px 110px; }
 .tab-page { display:none; }
-.tab-page.active { display:block; animation:fade .35s; }
-@keyframes fade { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
-
-/* HERO */
+.tab-page.active { display:block; }
 .hero-card { background:linear-gradient(160deg,#111a2e,#0a0f1c); border:1px solid var(--border-2); border-radius:26px; padding:24px 22px 20px; margin-bottom:14px; position:relative; overflow:hidden; transition:all .5s; }
-.hero-card::before { content:''; position:absolute; top:-80px; left:50%; transform:translateX(-50%); width:260px; height:260px; background:radial-gradient(circle,rgba(16,185,129,0.18),transparent 68%); transition:all .5s; }
-.hero-card.warning::before { background:radial-gradient(circle,rgba(245,158,11,0.2),transparent 68%); }
-.hero-card.critical::before { background:radial-gradient(circle,rgba(239,68,68,0.28),transparent 68%); animation:breathe 2s infinite; }
+.hero-card.warning { border-color:rgba(245,158,11,0.25); }
 .hero-card.critical { border-color:rgba(239,68,68,0.3); }
-@keyframes breathe { 0%,100%{opacity:1;} 50%{opacity:0.6;} }
-.hero-top { display:flex; justify-content:space-between; align-items:flex-start; position:relative; z-index:1; margin-bottom:4px; }
-.hero-label { font-size:0.68em; font-weight:700; color:var(--faint); letter-spacing:0.14em; text-transform:uppercase; }
+.hero-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px; }
+.hero-label { font-size:0.68em; font-weight:700; color:var(--faint); text-transform:uppercase; }
 .hero-title { font-size:0.92em; font-weight:600; margin-top:4px; color:var(--dim); }
-.status-pill { padding:6px 13px; border-radius:18px; font-size:0.63em; font-weight:800; letter-spacing:0.12em; text-transform:uppercase; background:rgba(16,185,129,0.12); color:var(--success); border:1px solid rgba(16,185,129,0.25); transition:all .4s; }
+.status-pill { padding:6px 13px; border-radius:18px; font-size:0.63em; font-weight:800; text-transform:uppercase; background:rgba(16,185,129,0.12); color:var(--success); border:1px solid rgba(16,185,129,0.25); }
 .status-pill.warning { background:rgba(245,158,11,0.12); color:var(--warning); border-color:rgba(245,158,11,0.3); }
-.status-pill.critical { background:rgba(239,68,68,0.15); color:var(--critical); border-color:rgba(239,68,68,0.35); animation:blink 1.2s infinite; }
-.gauge-outer { display:flex; justify-content:center; margin:8px 0 6px; position:relative; z-index:1; }
-.gauge { width:190px; height:190px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:conic-gradient(var(--success) 0deg,rgba(148,163,184,0.06) 0deg); transition:background .8s; box-shadow:0 0 60px rgba(16,185,129,0.15); }
+.status-pill.critical { background:rgba(239,68,68,0.15); color:var(--critical); border-color:rgba(239,68,68,0.35); }
+.status-pill.offline { background:rgba(86,98,116,0.15); color:var(--faint); }
+.gauge-outer { display:flex; justify-content:center; margin:8px 0 6px; }
+.gauge { width:190px; height:190px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:conic-gradient(var(--success) 0deg,rgba(148,163,184,0.06) 0deg); transition:background .8s; }
 .gauge.warning { box-shadow:0 0 60px rgba(245,158,11,0.2); }
 .gauge.critical { box-shadow:0 0 70px rgba(239,68,68,0.3); }
-.gauge-hole { width:162px; height:162px; border-radius:50%; background:radial-gradient(circle at 50% 0%,#111a2e,#05070d); display:flex; flex-direction:column; align-items:center; justify-content:center; box-shadow:inset 0 4px 30px rgba(0,0,0,0.6); }
-.gauge-val { font-size:3.2em; font-weight:800; letter-spacing:-0.05em; line-height:1; color:#fff; transition:color .4s; }
+.gauge-hole { width:162px; height:162px; border-radius:50%; background:radial-gradient(circle at 50% 0%,#111a2e,#05070d); display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.gauge-val { font-size:3.2em; font-weight:800; line-height:1; color:#fff; }
 .gauge-val.warning { color:var(--warning); }
 .gauge-val.critical { color:var(--critical); }
-.gauge-sub { font-size:0.68em; color:var(--faint); margin-top:6px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; }
-.hero-hint { text-align:center; font-size:0.82em; color:var(--dim); font-weight:500; margin-top:6px; position:relative; z-index:1; }
-
-/* QUICK STATS */
+.gauge-sub { font-size:0.68em; color:var(--faint); margin-top:6px; font-weight:600; text-transform:uppercase; }
+.hero-hint { text-align:center; font-size:0.82em; color:var(--dim); font-weight:500; margin-top:6px; }
 .q-stats { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
 .q-stat { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:15px 16px; }
-.q-stat .lbl { font-size:0.63em; font-weight:700; color:var(--faint); letter-spacing:0.13em; text-transform:uppercase; margin-bottom:8px; }
-.q-stat .val { font-size:1.5em; font-weight:800; letter-spacing:-0.03em; color:#fff; }
-.q-stat .val span { font-size:0.5em; color:var(--faint); margin-left:3px; font-weight:600; }
-
-/* METRICS */
+.q-stat .lbl { font-size:0.63em; font-weight:700; color:var(--faint); text-transform:uppercase; margin-bottom:8px; }
+.q-stat .val { font-size:1.5em; font-weight:800; color:#fff; }
+.q-stat .val span { font-size:0.5em; color:var(--faint); margin-left:3px; }
 .metrics-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:16px; }
-.m-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:13px 12px; transition:all .3s; }
-.m-card .lbl { font-size:0.6em; font-weight:700; color:var(--faint); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:6px; }
-.m-card .val { font-size:1.15em; font-weight:800; letter-spacing:-0.02em; color:#fff; transition:color .3s; }
+.m-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:13px 12px; }
+.m-card .lbl { font-size:0.6em; font-weight:700; color:var(--faint); text-transform:uppercase; margin-bottom:6px; }
+.m-card .val { font-size:1.15em; font-weight:800; color:#fff; }
 .m-card .bar { height:3px; background:rgba(148,163,184,0.08); border-radius:3px; margin-top:9px; overflow:hidden; }
-.m-card .fill { height:100%; width:0; border-radius:3px; background:linear-gradient(90deg,var(--accent),#0ea5e9); transition:width .6s,background .4s; }
-.m-card.warning { border-color:rgba(245,158,11,0.25); }
+.m-card .fill { height:100%; width:0; border-radius:3px; background:linear-gradient(90deg,var(--accent),#0ea5e9); transition:width .6s; }
 .m-card.warning .val { color:var(--warning); }
 .m-card.warning .fill { background:linear-gradient(90deg,var(--warning),#d97706); }
-.m-card.critical { border-color:rgba(239,68,68,0.3); }
 .m-card.critical .val { color:var(--critical); }
 .m-card.critical .fill { background:linear-gradient(90deg,var(--critical),#dc2626); }
-
-/* SECTION */
 .section-h { display:flex; align-items:center; gap:8px; margin:20px 2px 12px; }
-.section-h h2 { font-size:0.72em; font-weight:700; color:var(--faint); letter-spacing:0.15em; text-transform:uppercase; }
+.section-h h2 { font-size:0.72em; font-weight:700; color:var(--faint); text-transform:uppercase; }
 .section-h::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,var(--border),transparent); }
-
-/* AGENT */
-.agent-card { background:linear-gradient(150deg,#111a2e,#0a0f1c); border:1px solid var(--border-2); border-radius:22px; padding:18px; position:relative; overflow:hidden; transition:all .5s; }
-.agent-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--success); box-shadow:0 0 24px rgba(16,185,129,0.5); transition:all .4s; }
-.agent-card.warning::before { background:var(--warning); box-shadow:0 0 24px rgba(245,158,11,0.5); }
-.agent-card.critical::before { background:var(--critical); box-shadow:0 0 28px rgba(239,68,68,0.6); }
+.agent-card { background:linear-gradient(150deg,#111a2e,#0a0f1c); border:1px solid var(--border-2); border-radius:22px; padding:18px; position:relative; overflow:hidden; }
+.agent-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--success); }
+.agent-card.warning::before { background:var(--warning); }
+.agent-card.critical::before { background:var(--critical); }
 .agent-head { display:flex; align-items:center; gap:12px; padding-bottom:14px; border-bottom:1px solid var(--border); margin-bottom:14px; }
-.agent-avatar { width:42px; height:42px; border-radius:12px; background:linear-gradient(145deg,#38bdf8,#0284c7); display:flex; align-items:center; justify-content:center; font-size:22px; box-shadow:0 4px 20px rgba(56,189,248,0.35); }
+.agent-avatar { width:42px; height:42px; border-radius:12px; background:linear-gradient(145deg,#38bdf8,#0284c7); display:flex; align-items:center; justify-content:center; font-size:22px; }
 .agent-head h3 { font-size:0.98em; font-weight:700; }
 .agent-head p { font-size:0.7em; color:var(--faint); margin-top:2px; }
-.agent-badge { margin-left:auto; padding:5px 11px; border-radius:14px; font-size:0.6em; font-weight:800; letter-spacing:0.13em; text-transform:uppercase; background:rgba(16,185,129,0.1); color:var(--success); border:1px solid rgba(16,185,129,0.25); }
+.agent-badge { margin-left:auto; padding:5px 11px; border-radius:14px; font-size:0.6em; font-weight:800; text-transform:uppercase; background:rgba(16,185,129,0.1); color:var(--success); border:1px solid rgba(16,185,129,0.25); }
 .agent-badge.warning { background:rgba(245,158,11,0.1); color:var(--warning); border-color:rgba(245,158,11,0.25); }
 .agent-badge.critical { background:rgba(239,68,68,0.12); color:var(--critical); border-color:rgba(239,68,68,0.35); }
 .reasons { list-style:none; margin-bottom:12px; }
-.reasons li { padding:10px 14px; margin:6px 0; background:rgba(5,7,13,0.6); border-left:2px solid var(--accent); border-radius:8px; font-size:0.82em; line-height:1.5; animation:slideR .4s; font-weight:500; }
-@keyframes slideR { from{opacity:0;transform:translateX(-10px);} to{opacity:1;transform:translateX(0);} }
+.reasons li { padding:10px 14px; margin:6px 0; background:rgba(5,7,13,0.6); border-left:2px solid var(--accent); border-radius:8px; font-size:0.82em; line-height:1.5; }
 .action-block { background:linear-gradient(135deg,rgba(56,189,248,0.06),rgba(56,189,248,0.02)); border:1px solid rgba(56,189,248,0.14); border-radius:12px; padding:12px 14px; }
-.action-block .lbl { font-size:0.6em; font-weight:800; color:var(--accent); letter-spacing:0.16em; text-transform:uppercase; margin-bottom:6px; }
-.action-block .txt { font-size:0.85em; line-height:1.5; font-weight:500; }
-.approve-btn { width:100%; padding:15px; border:none; border-radius:14px; background:linear-gradient(90deg,#10b981,#059669); color:#fff; font-weight:700; font-size:0.9em; letter-spacing:0.04em; cursor:pointer; margin-top:12px; display:none; box-shadow:0 10px 30px rgba(16,185,129,0.35); transition:transform .15s; text-transform:uppercase; font-family:inherit; }
-.approve-btn.show { display:block; animation:slideUp .4s; }
-.approve-btn:active { transform:scale(0.97); }
-@keyframes slideUp { from{opacity:0;transform:translateY(12px);} to{opacity:1;transform:translateY(0);} }
-
-/* DEMO */
+.action-block .lbl { font-size:0.6em; font-weight:800; color:var(--accent); text-transform:uppercase; margin-bottom:6px; }
+.action-block .txt { font-size:0.85em; line-height:1.5; }
+.approve-btn { width:100%; padding:15px; border:none; border-radius:14px; background:linear-gradient(90deg,#10b981,#059669); color:#fff; font-weight:700; font-size:0.9em; cursor:pointer; margin-top:12px; display:none; text-transform:uppercase; }
+.approve-btn.show { display:block; }
 .demo-panel { background:var(--card); border:1px solid var(--border-2); border-radius:18px; padding:14px; margin-top:18px; }
-.demo-panel .lbl { font-size:0.62em; font-weight:800; color:var(--faint); letter-spacing:0.16em; text-transform:uppercase; margin-bottom:10px; display:block; }
+.demo-panel .lbl { font-size:0.62em; font-weight:800; color:var(--faint); text-transform:uppercase; margin-bottom:10px; display:block; }
 .demo-grid { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:8px; }
-.d-btn { padding:12px 6px; border:1px solid; border-radius:11px; font-weight:700; font-size:0.72em; cursor:pointer; background:transparent; transition:all .2s; font-family:inherit; }
-.d-btn:active { transform:scale(0.95); }
+.d-btn { padding:12px 6px; border:1px solid; border-radius:11px; font-weight:700; font-size:0.72em; cursor:pointer; background:transparent; }
 .d-btn.normal { color:var(--success); border-color:rgba(16,185,129,0.3); background:rgba(16,185,129,0.06); }
 .d-btn.warning { color:var(--warning); border-color:rgba(245,158,11,0.3); background:rgba(245,158,11,0.06); }
 .d-btn.critical { color:var(--critical); border-color:rgba(239,68,68,0.3); background:rgba(239,68,68,0.06); }
 .d-btn.stop { color:var(--faint); border-color:var(--border-2); }
-
-/* BOTTOM NAV */
-.bottom-nav { position:absolute; bottom:0; left:0; right:0; background:rgba(10,15,28,0.92); backdrop-filter:blur(28px); -webkit-backdrop-filter:blur(28px); border-top:1px solid var(--border-2); display:flex; padding:10px 12px 16px; z-index:10; gap:4px; }
-.nav-item { flex:1; display:flex; flex-direction:column; align-items:center; gap:5px; padding:8px 4px; cursor:pointer; border:none; background:transparent; color:var(--faint); transition:color .25s; border-radius:12px; font-family:inherit; }
-.nav-item .ico { font-size:1.25em; line-height:1; }
-.nav-item .lbl { font-size:0.6em; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; }
+.bottom-nav { position:absolute; bottom:0; left:0; right:0; background:rgba(10,15,28,0.92); border-top:1px solid var(--border-2); display:flex; padding:10px 12px 16px; z-index:10; gap:4px; }
+.nav-item { flex:1; display:flex; flex-direction:column; align-items:center; gap:5px; padding:8px 4px; cursor:pointer; border:none; background:transparent; color:var(--faint); font-family:inherit; }
+.nav-item .ico { font-size:1.25em; }
+.nav-item .lbl { font-size:0.6em; font-weight:700; text-transform:uppercase; }
 .nav-item.active { color:var(--accent); }
-.nav-item.active .ico { filter:drop-shadow(0 0 10px rgba(56,189,248,0.6)); }
-
-/* CHART */
-.chart-card { background:var(--card); border:1px solid var(--border-2); border-radius:18px; padding:16px; margin-bottom:12px; }
-.chart-card .title { font-size:0.68em; font-weight:700; color:var(--faint); letter-spacing:0.12em; text-transform:uppercase; margin-bottom:12px; }
-
-/* INFO */
 .info-row { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:14px 16px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; }
-.info-row .lbl { font-size:0.68em; font-weight:700; color:var(--faint); letter-spacing:0.1em; text-transform:uppercase; }
+.info-row .lbl { font-size:0.68em; font-weight:700; color:var(--faint); text-transform:uppercase; }
 .info-row .val { font-size:0.92em; font-weight:700; }
 .alert-item { background:var(--card); border:1px solid var(--border); border-left:3px solid var(--warning); border-radius:12px; padding:12px 14px; margin-bottom:8px; }
 .alert-item.critical { border-left-color:var(--critical); }
 .alert-item .time { font-size:0.7em; color:var(--faint); margin-bottom:4px; }
 .alert-item .status { font-weight:700; font-size:0.85em; }
-
-/* TOAST */
-.toast { position:fixed; bottom:105px; left:50%; transform:translateX(-50%) translateY(60px); background:linear-gradient(90deg,#10b981,#059669); color:#fff; padding:13px 24px; border-radius:14px; font-weight:700; font-size:0.85em; opacity:0; transition:all .4s cubic-bezier(.2,.9,.4,1); z-index:100; box-shadow:0 12px 40px rgba(16,185,129,0.5); pointer-events:none; white-space:nowrap; }
+.toast { position:fixed; bottom:105px; left:50%; transform:translateX(-50%) translateY(60px); background:linear-gradient(90deg,#10b981,#059669); color:#fff; padding:13px 24px; border-radius:14px; font-weight:700; font-size:0.85em; opacity:0; transition:all .4s; z-index:100; pointer-events:none; }
 .toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
-.toast.critical { background:linear-gradient(90deg,#ef4444,#dc2626); box-shadow:0 12px 40px rgba(239,68,68,0.5); }
-.toast.warning { background:linear-gradient(90deg,#f59e0b,#d97706); box-shadow:0 12px 40px rgba(245,158,11,0.5); }
+.toast.critical { background:linear-gradient(90deg,#ef4444,#dc2626); }
+.toast.warning { background:linear-gradient(90deg,#f59e0b,#d97706); }
 </style>
 </head>
 <body>
-
 <div class="app">
-  <div class="status-bar">
-    <span class="time" id="clock">9:41</span>
-    <div class="icons"><span>▪▪▪</span><span>◐</span><span>🔋</span></div>
-  </div>
-
+  <div class="status-bar"><span class="time" id="clock">9:41</span><div style="display:flex;gap:5px;">▪▪▪ ◐ 🔋</div></div>
   <div class="top-bar">
     <div class="brand-row">
       <div class="logo-mark">⚡</div>
-      <div>
-        <h1>VoltGuard</h1>
-        <div class="sub">AI Battery Agent</div>
-      </div>
+      <div><h1>VoltGuard</h1><div class="sub">AI Battery Agent</div></div>
     </div>
-    <div class="live-dot" id="livePill">
-      <span class="dot"></span>
-      <span id="liveText">DEMO</span>
-    </div>
+    <div class="live-dot" id="livePill"><span class="dot"></span><span id="liveText">LIVE</span></div>
   </div>
-
   <div class="screen">
-
-    <!-- HOME -->
     <div class="tab-page active" id="tab-home">
       <div class="hero-card" id="heroCard">
         <div class="hero-top">
-          <div>
-            <div class="hero-label">Battery Health</div>
-            <div class="hero-title">Live Monitoring</div>
-          </div>
+          <div><div class="hero-label">Battery Health</div><div class="hero-title">Live Monitoring</div></div>
           <div class="status-pill" id="statusPill">NORMAL</div>
         </div>
-        <div class="gauge-outer">
-          <div class="gauge" id="gauge">
-            <div class="gauge-hole">
-              <div class="gauge-val" id="healthVal">95</div>
-              <div class="gauge-sub">Health Score</div>
-            </div>
-          </div>
-        </div>
+        <div class="gauge-outer"><div class="gauge" id="gauge"><div class="gauge-hole"><div class="gauge-val" id="healthVal">--</div><div class="gauge-sub">Health Score</div></div></div></div>
         <div class="hero-hint" id="heroHint">All systems nominal</div>
       </div>
-
       <div class="q-stats">
-        <div class="q-stat"><div class="lbl">Remaining Life</div><div class="val" id="rulVal">365<span>days</span></div></div>
-        <div class="q-stat"><div class="lbl">Failure Risk</div><div class="val" id="riskVal">5<span>%</span></div></div>
+        <div class="q-stat"><div class="lbl">Remaining Life</div><div class="val" id="rulVal">--<span>days</span></div></div>
+        <div class="q-stat"><div class="lbl">Failure Risk</div><div class="val" id="riskVal">--<span>%</span></div></div>
       </div>
-
       <div class="metrics-row">
-        <div class="m-card" id="cardV"><div class="lbl">Voltage</div><div class="val" id="vVal">12.60V</div><div class="bar"><div class="fill" id="fV" style="width:90%"></div></div></div>
-        <div class="m-card" id="cardC"><div class="lbl">Current</div><div class="val" id="cVal">2.00A</div><div class="bar"><div class="fill" id="fC" style="width:33%"></div></div></div>
-        <div class="m-card" id="cardT"><div class="lbl">Temp</div><div class="val" id="tVal">28.0°</div><div class="bar"><div class="fill" id="fT" style="width:47%"></div></div></div>
+        <div class="m-card" id="cardV"><div class="lbl">Voltage</div><div class="val" id="vVal">--</div><div class="bar"><div class="fill" id="fV"></div></div></div>
+        <div class="m-card" id="cardC"><div class="lbl">Current</div><div class="val" id="cVal">--</div><div class="bar"><div class="fill" id="fC"></div></div></div>
+        <div class="m-card" id="cardT"><div class="lbl">Temp</div><div class="val" id="tVal">--</div><div class="bar"><div class="fill" id="fT"></div></div></div>
       </div>
-
       <div class="section-h"><h2>AI Agent Analysis</h2></div>
-
       <div class="agent-card" id="agentCard">
         <div class="agent-head">
           <div class="agent-avatar">🤖</div>
-          <div>
-            <h3>Health Agent</h3>
-            <p>Observing → Reasoning → Alerting</p>
-          </div>
-          <div class="agent-badge" id="agentBadge">NORMAL</div>
+          <div><h3>Health Agent</h3><p>Observing → Reasoning → Alerting</p></div>
+          <div class="agent-badge" id="agentBadge">WAITING</div>
         </div>
-        <ul class="reasons" id="reasonsList">
-          <li>All parameters within safe operating range</li>
-        </ul>
-        <div class="action-block">
-          <div class="lbl">Recommended Action</div>
-          <div class="txt" id="actionTxt">No action needed. Battery is healthy.</div>
-        </div>
+        <ul class="reasons" id="reasonsList"><li>Waiting for sensor data...</li></ul>
+        <div class="action-block"><div class="lbl">Recommended Action</div><div class="txt" id="actionTxt">--</div></div>
         <button class="approve-btn" id="approveBtn" onclick="approveAction()">✓ Approve Inspection</button>
       </div>
-
       <div class="demo-panel">
-        <span class="lbl">Demo Controls</span>
+        <span class="lbl">⚙ System Controls</span>
         <div class="demo-grid">
           <button class="d-btn normal" onclick="setPhase('normal')">Normal</button>
           <button class="d-btn warning" onclick="setPhase('warning')">Warning</button>
@@ -243,86 +161,50 @@ html,body { height:100%; overflow:hidden; font-family:-apple-system,BlinkMacSyst
         </div>
       </div>
     </div>
-
-    <!-- CHARTS -->
-    <div class="tab-page" id="tab-charts">
-      <div class="section-h"><h2>Live Trends</h2></div>
-      <div class="chart-card"><div class="title">Voltage</div><canvas id="vChart" height="120"></canvas></div>
-      <div class="chart-card"><div class="title">Temperature</div><canvas id="tChart" height="120"></canvas></div>
-      <div class="chart-card"><div class="title">Failure Risk</div><canvas id="rChart" height="120"></canvas></div>
-    </div>
-
-    <!-- ALERTS -->
     <div class="tab-page" id="tab-alerts">
       <div class="section-h"><h2>Alert History</h2></div>
-      <div id="alertList">
-        <div class="alert-item"><div class="time">No alerts yet</div><div class="status">System ready</div></div>
-      </div>
+      <div id="alertList"><div class="alert-item"><div class="time">No alerts yet</div><div class="status">System ready</div></div></div>
     </div>
-
-    <!-- INFO -->
     <div class="tab-page" id="tab-info">
       <div class="section-h"><h2>System Status</h2></div>
-      <div class="info-row"><div class="lbl">Mode</div><div class="val" style="color:#10b981;">Demo Mode</div></div>
+      <div class="info-row"><div class="lbl">Backend</div><div class="val" id="infoBackend">Checking...</div></div>
       <div class="info-row"><div class="lbl">Last Sync</div><div class="val" id="infoTime">--</div></div>
       <div class="info-row"><div class="lbl">Voltage</div><div class="val" id="infoV">--</div></div>
       <div class="info-row"><div class="lbl">Current</div><div class="val" id="infoC">--</div></div>
       <div class="info-row"><div class="lbl">Temperature</div><div class="val" id="infoT">--</div></div>
       <div class="info-row"><div class="lbl">State of Charge</div><div class="val" id="infoSOC">--</div></div>
-      <div class="info-row"><div class="lbl">Total Readings</div><div class="val" id="infoCount">0</div></div>
     </div>
-
   </div>
-
   <div class="bottom-nav">
     <button class="nav-item active" onclick="switchTab('home',this)"><span class="ico">◆</span><span class="lbl">Home</span></button>
-    <button class="nav-item" onclick="switchTab('charts',this)"><span class="ico">◐</span><span class="lbl">Charts</span></button>
     <button class="nav-item" onclick="switchTab('alerts',this)"><span class="ico">🔔</span><span class="lbl">Alerts</span></button>
     <button class="nav-item" onclick="switchTab('info',this)"><span class="ico">≡</span><span class="lbl">Info</span></button>
   </div>
 </div>
-
 <div class="toast" id="toast">Ticket Created</div>
 
 <script>
-/* ==========================================
-   DEMO MODE — No backend needed
-   ========================================== */
-let demoMode = "normal";
+const API = "http://127.0.0.1:5000";
 let lastStatus = "";
-let vChart, tChart, rChart;
+let simTimer = null;
 let voiceUnlocked = false;
-let history = [];
-let alertLog = [];
-let lastData = null;
 
-const state = {
-  voltage: 12.6, current: 2.0, temperature: 28.0,
-  soc: 87, status: "NORMAL", risk: 5, health: 95,
-  rul_days: 365,
-  reasons: ["All parameters within safe operating range"],
-  action: "No action needed. Battery is healthy.",
-  timestamp: new Date().toISOString()
-};
-
-/* CLOCK */
 function tick() {
   const d = new Date();
   let h = d.getHours() % 12 || 12;
   let m = String(d.getMinutes()).padStart(2,'0');
-  document.getElementById("clock").textContent = `${h}:${m}`;
+  document.getElementById("clock").textContent = h + ":" + m;
 }
 setInterval(tick, 1000); tick();
 
-/* TABS */
 function switchTab(name, el) {
   document.querySelectorAll(".tab-page").forEach(p => p.classList.remove("active"));
   document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
   document.getElementById("tab-" + name).classList.add("active");
   el.classList.add("active");
+  if (name === "alerts") loadAlerts();
 }
 
-/* AUDIO UNLOCK */
 function unlockAudio() {
   if (voiceUnlocked) return;
   voiceUnlocked = true;
@@ -340,15 +222,8 @@ function unlockAudio() {
 document.addEventListener("click", unlockAudio, { once: true });
 document.addEventListener("touchstart", unlockAudio, { once: true });
 
-if ('speechSynthesis' in window) {
-  speechSynthesis.getVoices();
-  speechSynthesis.onvoiceschanged = () => {
-    console.log("[VOICE] Voices:", speechSynthesis.getVoices().length);
-  };
-}
-
-/* SPEAK */
-function speak(text, rate = 0.9) {
+function speak(text, rate) {
+  rate = rate || 0.9;
   if (!('speechSynthesis' in window)) return;
   speechSynthesis.cancel();
   setTimeout(() => {
@@ -366,8 +241,9 @@ function speak(text, rate = 0.9) {
   }, 100);
 }
 
-/* BEEP */
-function beep(freq = 880, count = 2) {
+function beep(freq, count) {
+  freq = freq || 880;
+  count = count || 2;
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     if (ctx.state === "suspended") ctx.resume();
@@ -386,118 +262,52 @@ function beep(freq = 880, count = 2) {
   } catch(e) {}
 }
 
-/* ALERTS */
 function playCriticalAlert(d) {
   console.log("[ALERT] CRITICAL");
   beep(880, 3);
-  const text = `Critical battery alert. Voltage ${d.voltage.toFixed(1)} volts. Current ${d.current.toFixed(1)} amps. Temperature ${d.temperature.toFixed(0)} degrees celsius. Failure risk ${d.risk} percent. Health score ${d.health} out of 100. ${d.action}`;
+  const text = "Critical battery alert. Voltage " + d.voltage.toFixed(1) + " volts. Temperature " + d.temperature.toFixed(0) + " degrees. Immediate inspection required.";
   speak(text, 0.9);
   if (navigator.vibrate) navigator.vibrate([300, 150, 300, 150, 300]);
   showToast("🚨 Critical battery alert", "critical");
-  logAlert("CRITICAL", d);
 }
 
 function playWarningAlert(d) {
   console.log("[ALERT] WARNING");
   beep(660, 2);
-  const text = `Warning. Battery parameters abnormal. Voltage ${d.voltage.toFixed(1)} volts. Temperature ${d.temperature.toFixed(0)} degrees. Risk ${d.risk} percent. ${d.action}`;
+  const text = "Warning. Battery parameters abnormal. Voltage " + d.voltage.toFixed(1) + " volts. Temperature " + d.temperature.toFixed(0) + " degrees.";
   speak(text, 0.95);
   if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
   showToast("⚠️ Battery warning", "warning");
-  logAlert("WARNING", d);
 }
 
 function playNormalSound(d) {
   beep(520, 1);
-  speak(`Battery is healthy. All systems nominal. Voltage ${d.voltage.toFixed(1)} volts.`, 1.0);
+  speak("Battery healthy. Voltage " + d.voltage.toFixed(1) + " volts.", 1.0);
 }
 
-/* ALERT LOG */
-function logAlert(status, d) {
-  alertLog.unshift({
-    time: new Date().toLocaleTimeString(),
-    status: status,
-    risk: d.risk,
-    voltage: d.voltage,
-    temperature: d.temperature
-  });
-  if (alertLog.length > 20) alertLog.pop();
-}
-
-/* GENERATE DATA */
-function rand(min, max) { return Math.random() * (max - min) + min; }
-
-function generateData() {
-  if (demoMode === "normal") {
-    state.voltage = +(12.6 + rand(-0.1, 0.1)).toFixed(2);
-    state.current = +(2.0 + rand(-0.3, 0.3)).toFixed(2);
-    state.temperature = +(28.0 + rand(-1, 1)).toFixed(1);
-    state.soc = Math.floor(rand(85, 92));
-    state.status = "NORMAL";
-    state.risk = Math.floor(rand(3, 10));
-    state.health = 95;
-    state.rul_days = 365;
-    state.reasons = ["All parameters within safe operating range"];
-    state.action = "No action needed. Battery is healthy.";
-  } else if (demoMode === "warning") {
-    state.voltage = +(12.0 + rand(-0.1, 0.1)).toFixed(2);
-    state.current = +(3.8 + rand(-0.2, 0.2)).toFixed(2);
-    state.temperature = +(41.5 + rand(-0.5, 0.5)).toFixed(1);
-    state.soc = Math.floor(rand(60, 72));
-    state.status = "WARNING";
-    state.risk = Math.floor(rand(45, 60));
-    state.health = Math.floor(rand(55, 65));
-    state.rul_days = Math.floor(rand(180, 220));
-    state.reasons = [
-      `Elevated temperature: ${state.temperature}°C`,
-      `Voltage below nominal: ${state.voltage}V`,
-      "High current draw detected"
-    ];
-    state.action = "Schedule inspection within 48 hours.";
-  } else if (demoMode === "critical") {
-    state.voltage = +(11.2 + rand(-0.1, 0.1)).toFixed(2);
-    state.current = +(4.8 + rand(-0.2, 0.2)).toFixed(2);
-    state.temperature = +(46.0 + rand(-1, 1)).toFixed(1);
-    state.soc = Math.floor(rand(25, 40));
-    state.status = "CRITICAL";
-    state.risk = Math.floor(rand(80, 92));
-    state.health = Math.floor(rand(20, 30));
-    state.rul_days = Math.floor(rand(5, 10));
-    state.reasons = [
-      `Critical voltage: ${state.voltage}V (below cutoff)`,
-      `Overheating: ${state.temperature}°C`,
-      "Abnormal voltage drop rate",
-      "High current draw sustained"
-    ];
-    state.action = "Immediate inspection required. Stop charging.";
+async function fetchData() {
+  try {
+    const r = await fetch(API + "/data");
+    const d = await r.json();
+    render(d);
+    document.getElementById("livePill").className = "live-dot";
+    document.getElementById("liveText").textContent = "LIVE";
+    document.getElementById("infoBackend").textContent = "Online";
+    document.getElementById("infoBackend").style.color = "#10b981";
+  } catch (e) {
+    document.getElementById("livePill").className = "live-dot off";
+    document.getElementById("liveText").textContent = "OFFLINE";
+    document.getElementById("statusPill").textContent = "OFFLINE";
+    document.getElementById("statusPill").className = "status-pill offline";
+    document.getElementById("agentBadge").textContent = "OFFLINE";
+    document.getElementById("infoBackend").textContent = "Offline";
+    document.getElementById("infoBackend").style.color = "#ef4444";
   }
-  state.timestamp = new Date().toISOString();
-  return { ...state };
 }
 
-/* FETCH LOOP */
-function fetchData() {
-  const d = generateData();
-  render(d);
-
-  // Add to history
-  history.push({
-    time: new Date().toLocaleTimeString(),
-    voltage: d.voltage,
-    current: d.current,
-    temperature: d.temperature,
-    risk: d.risk
-  });
-  if (history.length > 60) history.shift();
-
-  lastData = d;
-}
-
-/* RENDER */
 function render(d) {
   const s = d.status.toLowerCase();
   const health = d.health;
-
   const gauge = document.getElementById("gauge");
   const hVal = document.getElementById("healthVal");
   const deg = (health / 100) * 360;
@@ -506,7 +316,7 @@ function render(d) {
   if (s === "critical") col = "#ef4444";
 
   gauge.className = "gauge" + (s === "normal" ? "" : " " + s);
-  gauge.style.background = `conic-gradient(${col} 0deg ${deg}deg, rgba(148,163,184,0.06) ${deg}deg 360deg)`;
+  gauge.style.background = "conic-gradient(" + col + " 0deg " + deg + "deg, rgba(148,163,184,0.06) " + deg + "deg 360deg)";
   hVal.textContent = health;
   hVal.className = "gauge-val" + (s === "normal" ? "" : " " + s);
 
@@ -519,8 +329,8 @@ function render(d) {
   const hints = { normal: "All systems nominal", warning: "Attention recommended", critical: "Immediate inspection required" };
   document.getElementById("heroHint").textContent = hints[s] || "Monitoring";
 
-  document.getElementById("rulVal").innerHTML = `${d.rul_days}<span>days</span>`;
-  document.getElementById("riskVal").innerHTML = `${d.risk}<span>%</span>`;
+  document.getElementById("rulVal").innerHTML = d.rul_days + "<span>days</span>";
+  document.getElementById("riskVal").innerHTML = d.risk + "<span>%</span>";
   document.getElementById("vVal").textContent = d.voltage.toFixed(2) + "V";
   document.getElementById("cVal").textContent = d.current.toFixed(2) + "A";
   document.getElementById("tVal").textContent = d.temperature.toFixed(1) + "°";
@@ -542,7 +352,7 @@ function render(d) {
   badge.textContent = d.status;
   badge.className = "agent-badge" + (s === "normal" ? "" : " " + s);
 
-  document.getElementById("reasonsList").innerHTML = d.reasons.map(r => `<li>${r}</li>`).join("");
+  document.getElementById("reasonsList").innerHTML = d.reasons.map(r => "<li>" + r + "</li>").join("");
   document.getElementById("actionTxt").textContent = d.action;
 
   const btn = document.getElementById("approveBtn");
@@ -555,7 +365,6 @@ function render(d) {
   document.getElementById("infoT").textContent = d.temperature.toFixed(1) + " °C";
   document.getElementById("infoSOC").textContent = d.soc + " %";
 
-  // STATUS CHANGE → VOICE
   if (d.status !== lastStatus) {
     if (d.status === "CRITICAL") playCriticalAlert(d);
     else if (d.status === "WARNING" && lastStatus !== "CRITICAL") playWarningAlert(d);
@@ -564,133 +373,63 @@ function render(d) {
   }
 }
 
-/* SET PHASE */
-function setPhase(p) {
-  if (p === "stop") return;
-  demoMode = p;
+async function setPhase(p) {
+  if (p === "stop") {
+    if (simTimer) clearInterval(simTimer);
+    simTimer = null;
+    return;
+  }
+  if (simTimer) clearInterval(simTimer);
+  
+  try {
+    await fetch(API + "/simulate/" + p, { method: "POST" });
+    console.log("Backend called:", p);
+  } catch (e) {
+    console.error("Backend call failed:", e);
+  }
+  
+  simTimer = setInterval(async () => {
+    try {
+      await fetch(API + "/simulate/" + p, { method: "POST" });
+    } catch(e) {}
+  }, 3000);
+  
   fetchData();
 }
 
-/* APPROVE */
+async function loadAlerts() {
+  try {
+    const r = await fetch(API + "/alerts");
+    const d = await r.json();
+    const list = document.getElementById("alertList");
+    if (!d.alerts.length) {
+      list.innerHTML = '<div class="alert-item"><div class="time">No alerts yet</div><div class="status">System ready</div></div>';
+      return;
+    }
+    list.innerHTML = d.alerts.map(a =>
+      '<div class="alert-item ' + (a.status === 'CRITICAL' ? 'critical' : '') + '">' +
+      '<div class="time">' + a.time + '</div>' +
+      '<div class="status">' + a.status + ' — Risk ' + a.risk + '% | V:' + a.voltage + 'V T:' + a.temperature + '°C</div>' +
+      '</div>'
+    ).join("");
+  } catch(e){}
+}
+
 function approveAction() {
   const t = "MT-" + Math.floor(1000 + Math.random() * 9000);
   showToast("✓ Ticket " + t + " created", "success");
   document.getElementById("approveBtn").classList.remove("show");
 }
 
-/* TOAST */
-function showToast(msg, type = "success") {
+function showToast(msg, type) {
   const el = document.getElementById("toast");
   el.textContent = msg;
-  el.className = "toast show" + (type !== "success" ? " " + type : "");
+  el.className = "toast show" + (type && type !== "success" ? " " + type : "");
   setTimeout(() => el.classList.remove("show"), 2500);
 }
 
-/* ALERTS TAB UPDATE */
-function renderAlerts() {
-  const list = document.getElementById("alertList");
-  if (!alertLog.length) {
-    list.innerHTML = '<div class="alert-item"><div class="time">No alerts yet</div><div class="status">System ready</div></div>';
-    return;
-  }
-  list.innerHTML = alertLog.map(a => `
-    <div class="alert-item ${a.status === 'CRITICAL' ? 'critical' : ''}">
-      <div class="time">${a.time}</div>
-      <div class="status">${a.status} — Risk ${a.risk}% | V:${a.voltage}V T:${a.temperature}°C</div>
-    </div>
-  `).join("");
-}
-
-/* CHARTS */
-function updateCharts() {
-  document.getElementById("infoCount").textContent = history.length;
-  if (history.length < 2) return;
-
-  const labels = history.map(x => x.time);
-  const common = {
-    responsive: true, maintainAspectRatio: false,
-    plugins: { legend: { display: false } },
-    scales: {
-      x: { display: false },
-      y: { grid: { color: "rgba(148,163,184,0.06)" }, ticks: { color: "#566274", font: { size: 10 } } }
-    },
-    elements: { point: { radius: 0 } }
-  };
-
-  const cd = (key, color) => ({
-    labels,
-    datasets: [{ data: history.map(x => x[key]), borderColor: color, borderWidth: 2, tension: 0.4, fill: true, backgroundColor: color + "22" }]
-  });
-
-  if (!vChart) vChart = new Chart(document.getElementById("vChart"), { type: "line", data: cd("voltage", "#38bdf8"), options: common });
-  else { vChart.data.labels = labels; vChart.data.datasets[0].data = history.map(x => x.voltage); vChart.update("none"); }
-
-  if (!tChart) tChart = new Chart(document.getElementById("tChart"), { type: "line", data: cd("temperature", "#f59e0b"), options: common });
-  else { tChart.data.labels = labels; tChart.data.datasets[0].data = history.map(x => x.temperature); tChart.update("none"); }
-
-  if (!rChart) rChart = new Chart(document.getElementById("rChart"), { type: "line", data: cd("risk", "#ef4444"), options: common });
-  else { rChart.data.labels = labels; rChart.data.datasets[0].data = history.map(x => x.risk); rChart.update("none"); }
-}
-
-/* LOOPS */
-setInterval(() => {
-  fetchData();
-  renderAlerts();
-}, 3000);
-
-setInterval(updateCharts, 3000);
-
-/* INIT */
+setInterval(fetchData, 1500);
 fetchData();
-updateCharts();
 </script>
-  <!-- FIREBASE CONNECTION -->
-<script type="module">
-
-  import { initializeApp }
-    from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-
-  import {
-    getDatabase,
-    ref,
-    onValue
-  } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
-
-
-  // Your Firebase configuration
-  const firebaseConfig = {
-    apiKey: "https://volt-gaurd-default-rtdb.asia-southeast1.firebasedatabase.app/",
-    authDomain: "volt-gaurd.firebaseapp.com",
-    databaseURL: "https://volt-gaurd-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "volt-gaurd",
-    storageBucket: "volt-gaurd.firebasestorage.app",
-    messagingSenderId: "282062494637",
-    appId: "1:282062494637:web:218d171ac55c9c89341f24",
-    measurementId: "G-9H4KCRYLJX"
-  };
-
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-
-  // Connect to Realtime Database
-  const database = getDatabase(app);
-
-  // Select device01
-  const deviceRef = ref(database, "device01");
-
-
-  // Listen for live changes
-  onValue(deviceRef, (snapshot) => {
-
-    const data = snapshot.val();
-
-    console.log("🔥 Firebase data received:");
-    console.log(data);
-
-  });
-
-</script>
-
 </body>
 </html>
