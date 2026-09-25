@@ -19,15 +19,27 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     try:
         data = json.loads(msg.payload.decode())
-        v = float(data.get("voltage", 0))
-        c = float(data.get("current", 0))
-        t = float(data.get("temperature", 0))
-        print(f"[ESP32] V={v:.2f}V I={c:.2f}A T={t:.1f}°C")
-        requests.post(f"{BACKEND_URL}/hardware/data", 
-                     json={"voltage": v, "current": c, "temperature": t}, 
-                     timeout=5)
+        payload = {
+            "voltage": data.get("voltage", data.get("Voltage")),
+            "current": data.get("current", data.get("Current")),
+            "temperature": data.get("temperature", data.get("Temperature", data.get("temp"))),
+        }
+        if any(value is None for value in payload.values()):
+            raise ValueError("MQTT payload needs voltage, current, and temperature")
+
+        payload = {key: float(value) for key, value in payload.items()}
+        soc = data.get("soc", data.get("SOC"))
+        if soc is not None:
+            payload["soc"] = int(float(soc))
+
+        response = requests.post(f"{BACKEND_URL}/hardware/data", json=payload, timeout=5)
+        response.raise_for_status()
+        print(
+            f"[DASHBOARD] Updated: V={payload['voltage']:.2f}V "
+            f"I={payload['current']:.2f}A T={payload['temperature']:.1f}°C"
+        )
     except Exception as e:
-        print(f"[ERROR] {e}")
+        print(f"[MQTT ERROR] {e}")
 
 def main():
     client = mqtt.Client(client_id="VoltGuard_Bridge")

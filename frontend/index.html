@@ -87,7 +87,7 @@ html,body { height:100%; overflow:hidden; font-family:-apple-system,'SF Pro Disp
 .approve-btn.show { display:block; }
 .demo-panel { background:var(--card); border:1px solid var(--border-2); border-radius:18px; padding:14px; margin-top:18px; }
 .demo-panel .lbl { font-size:0.62em; font-weight:800; color:var(--faint); text-transform:uppercase; margin-bottom:10px; display:block; }
-.demo-grid { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:8px; }
+.demo-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
 .d-btn { padding:12px 6px; border:1px solid; border-radius:11px; font-weight:700; font-size:0.72em; cursor:pointer; background:transparent; }
 .d-btn.normal { color:var(--success); border-color:rgba(16,185,129,0.3); background:rgba(16,185,129,0.06); }
 .d-btn.warning { color:var(--warning); border-color:rgba(245,158,11,0.3); background:rgba(245,158,11,0.06); }
@@ -132,6 +132,7 @@ html,body { height:100%; overflow:hidden; font-family:-apple-system,'SF Pro Disp
         <div class="hero-hint" id="heroHint">All systems nominal</div>
       </div>
       <div class="q-stats">
+    
         <div class="q-stat"><div class="lbl">Failure Risk</div><div class="val" id="riskVal">--<span>%</span></div></div>
       </div>
       <div class="metrics-row">
@@ -156,13 +157,12 @@ html,body { height:100%; overflow:hidden; font-family:-apple-system,'SF Pro Disp
           <button class="d-btn normal" onclick="setPhase('normal')">Normal</button>
           <button class="d-btn warning" onclick="setPhase('warning')">Warning</button>
           <button class="d-btn critical" onclick="setPhase('critical')">Critical</button>
-          <button class="d-btn stop" onclick="setPhase('stop')">Stop</button>
         </div>
       </div>
     </div>
     <div class="tab-page" id="tab-alerts">
       <div class="section-h"><h2>Alert History</h2></div>
-      <div id="alertList"><div class="alert-item"><div class="time">Loading...</div><div class="status">Fetching alerts</div></div></div>
+      <div id="alertList"><div class="alert-item"><div class="time">No alerts yet</div><div class="status">System ready</div></div></div>
     </div>
     <div class="tab-page" id="tab-info">
       <div class="section-h"><h2>System Status</h2></div>
@@ -185,7 +185,6 @@ html,body { height:100%; overflow:hidden; font-family:-apple-system,'SF Pro Disp
 <script>
 const API = "http://127.0.0.1:5000";
 let lastStatus = "";
-let simTimer = null;
 let voiceUnlocked = false;
 
 function tick() {
@@ -372,27 +371,15 @@ function render(d) {
 }
 
 async function setPhase(p) {
-  if (p === "stop") {
-    if (simTimer) clearInterval(simTimer);
-    simTimer = null;
-    return;
-  }
-  if (simTimer) clearInterval(simTimer);
-  
+  if (p === "stop") return;
+
   try {
-    await fetch(API + "/simulate/" + p, { method: "POST" });
-    console.log("Backend called:", p);
+    const response = await fetch(API + "/simulate/" + p, { method: "POST" });
+    if (!response.ok) throw new Error("Simulation request failed: " + response.status);
+    await fetchData();
   } catch (e) {
-    console.error("Backend call failed:", e);
+    console.error("Simulation request failed:", e);
   }
-  
-  simTimer = setInterval(async () => {
-    try {
-      await fetch(API + "/simulate/" + p, { method: "POST" });
-    } catch(e) {}
-  }, 3000);
-  
-  fetchData();
 }
 
 async function loadAlerts() {
@@ -400,7 +387,7 @@ async function loadAlerts() {
     const r = await fetch(API + "/alerts");
     const d = await r.json();
     const list = document.getElementById("alertList");
-    if (!d.alerts || !d.alerts.length) {
+    if (!d.alerts.length) {
       list.innerHTML = '<div class="alert-item"><div class="time">No alerts yet</div><div class="status">System ready</div></div>';
       return;
     }
@@ -410,9 +397,7 @@ async function loadAlerts() {
       '<div class="status">' + a.status + ' — Risk ' + a.risk + '% | V:' + a.voltage + 'V T:' + a.temperature + '°C</div>' +
       '</div>'
     ).join("");
-  } catch(e){
-    console.error("loadAlerts error:", e);
-  }
+  } catch(e){}
 }
 
 function approveAction() {
@@ -429,15 +414,6 @@ function showToast(msg, type) {
 }
 
 setInterval(fetchData, 1500);
-
-// ⚠️ Auto-refresh alerts every 5 sec when Alerts tab is active
-setInterval(() => {
-  const alertsTab = document.getElementById("tab-alerts");
-  if (alertsTab && alertsTab.classList.contains("active")) {
-    loadAlerts();
-  }
-}, 5000);
-
 fetchData();
 </script>
 </body>
