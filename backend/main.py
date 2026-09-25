@@ -125,6 +125,16 @@ def simulate(phase: str):
         return {"error": "Invalid phase"}
 
     update_battery(v, c, t, soc)
+    
+    # DIRECT EMAIL TRIGGER - GUARANTEED
+    if battery["status"] in ["WARNING", "CRITICAL"]:
+        try:
+            from alerts import send_alert
+            send_alert(battery)
+            print(f"[EMAIL] ✓ SENT — {battery['status']}")
+        except Exception as e:
+            print(f"[EMAIL ERROR] {e}")
+    
     return battery
 
 
