@@ -9,16 +9,10 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime
 
-# ==========================================
-# ⚠️ CONFIGURE THESE (setup steps కింద)
-# ==========================================
-GMAIL_USER = "prempolisetti4492@gmail.com"       # మీ Gmail address
-GMAIL_APP_PASSWORD = "xxxx xxxx xxxx xxxx"  # 16-character app password
+GMAIL_USER = "voltguartalert@gmail.com"       # మీ Gmail address
+GMAIL_APP_PASSWORD = "tepnoncudxvpssca"  # 16-character app password
 TO_EMAIL = "prempolisetti492@gmail.com"           # alerts ఎవరికి పంపాలి
 
-# ==========================================
-# Anti-spam tracker
-# ==========================================
 _last_alert = {"time": None, "status": None}
 
 def _should_send(status):
