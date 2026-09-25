@@ -644,5 +644,53 @@ setInterval(updateCharts, 3000);
 fetchData();
 updateCharts();
 </script>
+  <!-- FIREBASE CONNECTION -->
+<script type="module">
+
+  import { initializeApp }
+    from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+
+  import {
+    getDatabase,
+    ref,
+    onValue
+  } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
+
+
+  // Your Firebase configuration
+  const firebaseConfig = {
+    apiKey: "https://volt-gaurd-default-rtdb.asia-southeast1.firebasedatabase.app/",
+    authDomain: "volt-gaurd.firebaseapp.com",
+    databaseURL: "https://volt-gaurd-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "volt-gaurd",
+    storageBucket: "volt-gaurd.firebasestorage.app",
+    messagingSenderId: "282062494637",
+    appId: "1:282062494637:web:218d171ac55c9c89341f24",
+    measurementId: "G-9H4KCRYLJX"
+  };
+
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+
+  // Connect to Realtime Database
+  const database = getDatabase(app);
+
+  // Select device01
+  const deviceRef = ref(database, "device01");
+
+
+  // Listen for live changes
+  onValue(deviceRef, (snapshot) => {
+
+    const data = snapshot.val();
+
+    console.log("🔥 Firebase data received:");
+    console.log(data);
+
+  });
+
+</script>
+
 </body>
 </html>
