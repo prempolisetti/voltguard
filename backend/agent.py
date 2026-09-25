@@ -12,13 +12,12 @@ from datetime import datetime
 # HEALTH CALCULATION
 # ==========================================
 def calculate_health(v, c, t):
-    """Calculate battery health score (0-100)"""
-    score = 100.0
-    score -= abs(12.6 - v) * 20
-    if t > 35:
-        score -= (t - 35) * 3
-    if c > 3:
-        score -= (c - 3) * 5
+    """Calculate battery health score (0-100) using realistic normal operating ranges."""
+    v_score = 100.0 - abs(12.6 - v) * 18
+    temp_score = 100.0 - max(0.0, t - 28.0) * 2.5
+    current_score = 100.0 - max(0.0, c - 2.0) * 12
+
+    score = (v_score + temp_score + current_score) / 3
     return max(0, min(100, round(score)))
 
 
@@ -131,7 +130,9 @@ def agent_reasoning(v, c, t, history):
     status = classify_status(v, c, t)
     health = calculate_health(v, c, t)
     rul = max(1, int(health * 3.6))
-    risk = max(0, 100 - health)
+    risk = max(0, min(100, 100 - health))
+    if status == "NORMAL":
+        risk = max(0, min(25, risk))
     reasons = build_reasons(v, c, t, status, history)
     action = recommend_action(status, t, v, health)
 
