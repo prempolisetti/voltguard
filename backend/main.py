@@ -97,6 +97,23 @@ def alerts():
 
 
 # ==========================================
+# HARDWARE / MQTT DATA INPUT
+# ==========================================
+@app.post("/hardware/data")
+def hardware_data(payload: dict):
+    try:
+        voltage = float(payload.get("voltage", battery["voltage"]))
+        current = float(payload.get("current", battery["current"]))
+        temperature = float(payload.get("temperature", battery["temperature"]))
+        soc = int(payload.get("soc", battery["soc"]))
+    except Exception:
+        return {"error": "Invalid hardware payload"}
+
+    update_battery(voltage, current, temperature, soc)
+    return battery
+
+
+# ==========================================
 # SIMULATE — EMAIL ALERT TRIGGER FOR WARNING + CRITICAL
 # ==========================================
 @app.post("/simulate/{phase}")
